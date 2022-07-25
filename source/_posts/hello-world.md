@@ -1,38 +1,62 @@
 ---
 title: Hello World
 ---
-Welcome to [Hexo](https://hexo.io/)! This is your very first post. Check [documentation](https://hexo.io/docs/) for more info. If you get any problems when using Hexo, you can find the answer in [troubleshooting](https://hexo.io/docs/troubleshooting.html) or you can ask me on [GitHub](https://github.com/hexojs/hexo/issues).
+# Trie树：Leetcode 最短的单词编码
 
-## Quick Start
+Link: [剑指 Offer II 065. 最短的单词编码 - 力扣（LeetCode） (leetcode-cn.com)](https://leetcode-cn.com/problems/iSwD2y/)
 
-### Create a new post
+题目要求计算所有不为其他单词后缀的单词长度之和（加上#）。考虑使用Trie树，将字符串反向插入。
 
-``` bash
-$ hexo new "My New Post"
+复杂度：时间O($\sum{w_i}$) 空间O($\sum{26w_i}$)
+
+$w_i$指第i个单词的长度，26是字符集大小
+
+Code:
+
+```c++
+class Solution {
+public:
+    struct TrieNode{
+        TrieNode* children[26];
+        int sonNum;
+        TrieNode(){
+            sonNum = 0;
+            for(int i=0;i<26;++i){
+                children[i]=NULL;
+            }
+        }
+
+        TrieNode* getSon(char c){
+            if(children[c-'a']==NULL){
+                children[c-'a']=new TrieNode();
+                sonNum++;
+            }
+            return children[c-'a'];
+        }
+
+    };
+    int minimumLengthEncoding(vector<string>& words) {
+        TrieNode* root = new TrieNode();
+        unordered_map<TrieNode*,int> nodeMap;
+        int res = 0;
+
+        for(int i=0;i<words.size();++i){
+            TrieNode* cur = root;
+            string str = words[i];
+            for(int j=str.size()-1;j>=0;--j){
+                cur = cur->getSon(str[j]);
+            }
+            nodeMap[cur]=str.size()+1;
+        }
+
+        for(auto [node,i]: nodeMap){
+            if(node->sonNum==0){
+                res+=i;
+            }
+        }
+
+            return res;
+    }
+};
 ```
 
-More info: [Writing](https://hexo.io/docs/writing.html)
-
-### Run server
-
-``` bash
-$ hexo server
-```
-
-More info: [Server](https://hexo.io/docs/server.html)
-
-### Generate static files
-
-``` bash
-$ hexo generate
-```
-
-More info: [Generating](https://hexo.io/docs/generating.html)
-
-### Deploy to remote sites
-
-``` bash
-$ hexo deploy
-```
-
-More info: [Deployment](https://hexo.io/docs/one-command-deployment.html)
